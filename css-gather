@@ -12,9 +12,18 @@ DOC
 
 def main url
   doc = Nokogiri.HTML(URI.open(url))
-  stylesheets = doc.css('link[rel="stylesheet"]')
-  stylesheets.each do |link|
-    puts URI.open(link['href']).read
+  stylesheets = doc.css('link[rel="stylesheet"],style')
+  stylesheets.each do |stylesheet|
+    case stylesheet.name
+    when "link"
+      puts URI.open(stylesheet['href']).read
+    when "style"
+      if not stylesheet['id'] =~ /criticalCss|cssHide/
+        puts stylesheet.content
+      end
+    else
+      die "Unexpected node type"
+    end
   end
 end
 
