@@ -6,11 +6,11 @@ require 'docopt'
 require 'nokogiri'
 require 'open-uri'
 
-docs = <<DOC
-Fetch CSS
+docs = <<~DOC
+  Fetch CSS
 
-Usage:
-  #{__FILE__} <url>
+  Usage:
+    #{__FILE__} <url>
 DOC
 
 def main url
