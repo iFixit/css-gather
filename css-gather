@@ -1,22 +1,25 @@
 #!/usr/bin/env ruby
-require "docopt"
+
+# frozen_string_literal: true
+
+require 'docopt'
 require 'nokogiri'
 require 'open-uri'
 
-docs = <<DOC
-Fetch CSS
+docs = <<~DOC
+  Fetch CSS
 
-Usage:
-  #{__FILE__} <url>
+  Usage:
+    #{__FILE__} <url>
 DOC
 
-def main url
-  doc = Nokogiri.HTML(URI.open(url))
+def main(url)
+  doc = Nokogiri.HTML(URI.parse(url).open)
   stylesheets = doc.css('link[rel="stylesheet"],style')
   stylesheets.each do |stylesheet|
     case stylesheet.name
     when "link"
-      puts URI.open(stylesheet['href']).read
+      puts URI.parse(stylesheet['href']).open.read
     when "style"
       if not stylesheet['id'] =~ /criticalCss|cssHide/
         puts stylesheet.content
