@@ -14,10 +14,10 @@ docs = <<~DOC
 DOC
 
 def main(url)
-  doc = Nokogiri.HTML(URI.open(url))
+  doc = Nokogiri.HTML(URI.parse(url).open)
   stylesheets = doc.css('link[rel="stylesheet"]')
   stylesheets.each do |link|
-    puts URI.open(link['href']).read
+    puts URI.parse(link['href']).open.read
   end
 end
 
