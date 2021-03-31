@@ -1,0 +1,23 @@
+{
+  "name": "css-gather",
+  "version": "0.0.1",
+  "description": "Gathers the critical CSS from a page",
+  "main": "critical-css.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iFixit/css-gather.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iFixit/css-gather/issues"
+  },
+  "homepage": "https://github.com/iFixit/css-gather#readme",
+  "dependencies": {
+    "penthouse": "^2.3.2",
+    "yargs": "^16.2.0"
+  }
+}
