@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    docopt (0.6.1)
+    nokogiri (1.11.2-x86_64-linux)
+      racc (~> 1.4)
+    racc (1.5.2)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  docopt (~> 0.6.1)
+  nokogiri (~> 1.11)
+
+BUNDLED WITH
+   2.2.3

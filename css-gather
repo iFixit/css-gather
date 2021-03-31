@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+require "docopt"
+require 'nokogiri'
+require 'open-uri'
+
+docs = <<DOC
+Fetch CSS
+
+Usage:
+  #{__FILE__} <url>
+DOC
+
+def main url
+  doc = Nokogiri.HTML(URI.open(url))
+  stylesheets = doc.css('link[rel="stylesheet"]')
+  stylesheets.each do |link|
+    puts URI.open(link['href']).read
+  end
+end
+
+begin
+  opts = Docopt.docopt(docs)
+  main opts['<url>']
+rescue Docopt::Exit => e
+  puts e.message
+  exit 1
+end
