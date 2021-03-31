@@ -1,9 +1,11 @@
 # css-gather
 Helpful tools for working with critical CSS
 
-`css-gather`: Fetches all the CSS files off a page and dumps their CSS to stdout.
-`critical-css.js`: Uses [penthouse](https://github.com/pocketjoso/penthouse) to extract the critical CSS from CSS passed on `stdin`.
-`run.sh`: Uses `css-gather` and `critical-css.js` to generate the critical CSS for a URL.
+<dl>
+<dt><tt>css-gather</tt></dt><dd>Fetches all the CSS files off a page and dumps their CSS to stdout.</dd>
+<dt><tt>critical-css.js</tt></dt><dd>Uses <a href="https://github.com/pocketjoso/penthouse">penthouse</a> to extract the critical CSS from CSS passed on `stdin`.</dd>
+<dt><tt>run.sh</tt></dt><dd>Uses `css-gather` and `critical-css.js` to generate the critical CSS for a URL.</dd>
+</dl>
 
 # Usage
 `cd` to a clone of this repo
