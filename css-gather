@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 require "docopt"
 require 'nokogiri'
 require 'open-uri'
