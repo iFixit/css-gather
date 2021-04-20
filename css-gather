@@ -17,8 +17,8 @@ def main(url)
   doc = Nokogiri.HTML(URI.parse(url).open)
   stylesheets = doc.css('link[rel="stylesheet"],style')
   stylesheets
+    .reject { |s| s['media'] == 'print' }
     .each do |stylesheet|
-      next if stylesheet['media'] == 'print'
       case stylesheet.name
       when 'link'
         puts URI.parse(stylesheet['href']).open.read
