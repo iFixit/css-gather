@@ -8,4 +8,4 @@ fi
 
 root="$(dirname "$0")"
 
-"$root/css-gather" "$1" | "$root/critical-css.js" "$1"
+"$root/css-gather" "$1" | "$root/critical-css.js" "$1" | npx --no-install prettier --parser=css
