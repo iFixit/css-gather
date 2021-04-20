@@ -6,14 +6,8 @@ require 'docopt'
 require 'nokogiri'
 require 'open-uri'
 
-def gather_css(url)
-  document = Nokogiri.HTML(URI.parse(url).open)
-
-  critical_css = document.css('link[rel="stylesheet"],style')
-    .reject { |s| s['media'] == 'print' }
-    .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
-
-  critical_css.each do |stylesheet|
+def print_styles(css)
+  css.each do |stylesheet|
       case stylesheet.name
       when 'link'
         puts URI.parse(stylesheet['href']).open.read
@@ -23,6 +17,15 @@ def gather_css(url)
         die 'Unexpected node type'
       end
   end
+end
+
+def gather_css(url)
+  document = Nokogiri.HTML(URI.parse(url).open)
+  all_css = document.css('link[rel="stylesheet"],style')
+  critical_css = all_css
+    .reject { |s| s['media'] == 'print' }
+    .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
+  print_styles(critical_css)
 end
 
 docs = <<~DOC
