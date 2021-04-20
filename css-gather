@@ -6,7 +6,7 @@ require 'docopt'
 require 'nokogiri'
 require 'open-uri'
 
-def main(url)
+def gather_css(url)
   document = Nokogiri.HTML(URI.parse(url).open)
 
   critical_css = document.css('link[rel="stylesheet"],style')
@@ -34,7 +34,7 @@ DOC
 
 begin
   opts = Docopt.docopt(docs)
-  main opts['<url>']
+  gather_css opts['<url>']
 rescue Docopt::Exit => e
   puts e.message
   exit 1
