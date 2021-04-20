@@ -14,8 +14,9 @@ docs = <<~DOC
 DOC
 
 def main(url)
-  Nokogiri.HTML(URI.parse(url).open)
-    .css('link[rel="stylesheet"],style')
+  document = Nokogiri.HTML(URI.parse(url).open)
+
+  document.css('link[rel="stylesheet"],style')
     .reject { |s| s['media'] == 'print' }
     .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
     .each do |stylesheet|
