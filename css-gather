@@ -6,13 +6,6 @@ require 'docopt'
 require 'nokogiri'
 require 'open-uri'
 
-docs = <<~DOC
-  Fetch CSS
-
-  Usage:
-    #{__FILE__} <url>
-DOC
-
 def main(url)
   document = Nokogiri.HTML(URI.parse(url).open)
 
@@ -31,6 +24,13 @@ def main(url)
       end
   end
 end
+
+docs = <<~DOC
+  Fetch CSS
+
+  Usage:
+    #{__FILE__} <url>
+DOC
 
 begin
   opts = Docopt.docopt(docs)
