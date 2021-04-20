@@ -16,10 +16,11 @@ DOC
 def main(url)
   document = Nokogiri.HTML(URI.parse(url).open)
 
-  document.css('link[rel="stylesheet"],style')
+  critical_css = document.css('link[rel="stylesheet"],style')
     .reject { |s| s['media'] == 'print' }
     .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
-    .each do |stylesheet|
+
+  critical_css.each do |stylesheet|
       case stylesheet.name
       when 'link'
         puts URI.parse(stylesheet['href']).open.read
