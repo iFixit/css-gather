@@ -26,5 +26,11 @@ function main(url) {
 function findCriticalCss(cssString, url) {
   return penthouse({
     url,
-    cssString
+    cssString,
+    pageLoadSkipTimeout: 60000,
+    renderWaitTime: 60000,
+    timeout: 120000,
+    width: 4096,
+    height: 2160,
+    blockJSRequests: false
   })}
