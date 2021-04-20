@@ -18,12 +18,13 @@ def main(url)
   stylesheets = doc.css('link[rel="stylesheet"],style')
   stylesheets
     .reject { |s| s['media'] == 'print' }
+    .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
     .each do |stylesheet|
       case stylesheet.name
       when 'link'
         puts URI.parse(stylesheet['href']).open.read
       when 'style'
-        puts stylesheet.content if stylesheet['id'] !~ /criticalCss|cssHide/
+        puts stylesheet.content
       else
         die 'Unexpected node type'
       end
