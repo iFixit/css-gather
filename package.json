@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/iFixit/css-gather#readme",
   "dependencies": {
+    "cssnano": "^5.0.1",
+    "cssnano-preset-advanced": "^5.0.0",
     "penthouse": "^2.3.2",
     "postcss": "^8.2.10",
     "postcss-cli": "^8.3.1",
