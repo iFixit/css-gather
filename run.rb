@@ -45,8 +45,10 @@ end
 
 ## Runs `command`, piping `data` to it. Returns the stdout.
 def subprocess(command, data)
-  IO.popen(command, 'w') do |io|
+  IO.popen(command, 'r+') do |io|
     io.write(data)
+    # Let the process know that's all the data
+    io.close_write
     io.read
   end
 end
