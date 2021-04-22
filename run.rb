@@ -7,6 +7,8 @@ require 'logger'
 require_relative './css-gather'
 
 DIR = Pathname.new(__dir__)
+$logger = Logger.new($stderr)
+$logger.level = 'info'
 
 def main
   opts = Docopt.docopt <<~DOCS
@@ -31,6 +33,7 @@ end
 
 def fetch_page_css(urls)
   urls.map do |url|
+    $logger.info("Fetching #{url}")
     CssGather.gather_css(url)
   end
 end
@@ -51,6 +54,7 @@ def find_css(urls, names)
 end
 
 def reduce_to_critical(css, urls)
+  $logger.info('Extracting critical CSS')
   subprocess(["#{__dir__}/critical-css.js", *urls], css)
 end
 
