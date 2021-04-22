@@ -2,6 +2,7 @@
 
 require 'docopt'
 require 'pathname'
+require 'open-uri'
 require 'logger'
 require_relative './css-gather'
 
@@ -9,27 +10,48 @@ DIR = Pathname.new(__dir__)
 
 def main
   opts = Docopt.docopt <<~DOCS
-    Usage: run.sh <url>...
+    Usage:
+      run.rb [--include=<url>...] <url>...
+
+    Options:
+      --include=<text>  Search the specified URLs for CSS files
   DOCS
-  find_critical(opts['<url>'])
+  find_critical(opts['<url>'], opts['--include'])
 rescue Docopt::Exit => e
   puts e.message
 end
 
-def find_critical(urls)
+def find_critical(urls, additional = [])
   css = fetch_page_css(urls)
-  critical_css = reduce_to_critical(css, urls)
-  prettier_css = prettify(critical_css)
-  combined_css = postcss(prettier_css)
-  puts combined_css
+  additional_css = find_css(urls, additional).join("\n")
+  critical_css = reduce_to_critical(css.join("\n"), urls)
+  combined_css = prettify("#{critical_css}\n#{additional_css}")
+  puts postcss(combined_css)
 end
 
 def fetch_page_css(urls)
-  urls.map { |url| CssGather.gather_css(url) }
+  urls.map do |url|
+    CssGather.gather_css(url)
+  end
+end
+
+def find_css(urls, names)
+  urls.map do |url|
+    names.flat_map do |name|
+      regexp = Regexp.new name
+      CssGather.find_stylesheets(url).flat_map do |tag|
+        href = tag['href']
+        if href =~ regexp
+          $logger.info("Fetching #{url}")
+          URI.parse(href).read
+        end
+      end
+    end
+  end
 end
 
 def reduce_to_critical(css, urls)
-  subprocess(["#{__dir__}/critical-css.js", *urls], css.join("\n"))
+  subprocess(["#{__dir__}/critical-css.js", *urls], css)
 end
 
 def prettify(css)
