@@ -7,26 +7,29 @@ require 'nokogiri'
 require 'open-uri'
 
 module CssGather
-  def self.print_styles(css)
-    css.each do |stylesheet|
+  def self.gather_css(url)
+    critical_css = find_stylesheets(url)
+    gather_stylesheets(critical_css)
+  end
+
+  def self.find_stylesheets(url)
+    document = Nokogiri.HTML(URI.parse(url).open)
+    all_css = document.css('link[rel="stylesheet"],style')
+    all_css.reject { |s| s['media'] == 'print' }
+           .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
+  end
+
+  def self.gather_stylesheets(css)
+    css.map do |stylesheet|
       case stylesheet.name
       when 'link'
-        puts URI.parse(stylesheet['href']).open.read
+        URI.parse(stylesheet['href']).open.read
       when 'style'
-        puts stylesheet.content
+        stylesheet.content
       else
         die 'Unexpected node type'
       end
-    end
-  end
-
-  def self.gather_css(url)
-    document = Nokogiri.HTML(URI.parse(url).open)
-    all_css = document.css('link[rel="stylesheet"],style')
-    critical_css = all_css
-                   .reject { |s| s['media'] == 'print' }
-                   .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
-    print_styles(critical_css)
+    end.join("\n")
   end
 end
 
