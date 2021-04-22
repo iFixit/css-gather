@@ -8,6 +8,7 @@ then
 fi
 
 file="$(readlink -e "$1")"
-cd "$(dirname "$0")"
-npx --no-install postcss -r "$file"
+gather_dir="$(readlink -e "$(dirname "$0")")"
+cd "$gather_dir"
+npx --no-install postcss --config="$gather_dir" -r "$file"
 npx --no-install prettier --write "$file"
