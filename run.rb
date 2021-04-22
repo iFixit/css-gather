@@ -2,6 +2,7 @@
 
 require 'docopt'
 require 'pathname'
+require 'logger'
 require_relative './css-gather'
 
 DIR = Pathname.new(__dir__)
@@ -32,12 +33,14 @@ def reduce_to_critical(css, urls)
 end
 
 def prettify(css)
+  $logger.info('Prettifying CSS')
   Dir.chdir(__dir__) do
     subprocess(['npx', '--no-install', 'prettier', '--parser=css'], css)
   end
 end
 
 def postcss(css)
+  $logger.info('Cleaning redundant CSS')
   Dir.chdir(__dir__) do
     subprocess(['npx', '--no-install', 'postcss'], css)
   end
