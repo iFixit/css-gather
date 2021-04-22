@@ -27,8 +27,8 @@ def find_critical(urls, additional = [])
   css = fetch_page_css(urls)
   additional_css = find_css(urls, additional).join("\n")
   critical_css = reduce_to_critical(css.join("\n"), urls)
-  combined_css = prettify("#{critical_css}\n#{additional_css}")
-  puts postcss(combined_css)
+  combined_css = postcss("#{critical_css}\n#{additional_css}")
+  puts prettify(combined_css)
 end
 
 def fetch_page_css(urls)
