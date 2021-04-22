@@ -18,6 +18,7 @@ function main(urls) {
   process.stdin.on('data', str => cssString += str)
   process.stdin.on('end', () => {
     urls.map(url => {
+      process.stderr.write(`Gathering critical CSS for ${url}\n`);
       findCriticalCss(cssString, url).then(criticalCss => {
         process.stdout.write(criticalCss)
       })
