@@ -17,7 +17,17 @@
   },
   "homepage": "https://github.com/iFixit/css-gather#readme",
   "dependencies": {
+    "cssnano": "^5.0.1",
+    "cssnano-preset-advanced": "^5.0.0",
     "penthouse": "^2.3.2",
+    "postcss": "^8.2.10",
+    "postcss-cli": "^8.3.1",
+    "postcss-sorting": "^6.0.0",
+    "prettier": "^2.2.1",
     "yargs": "^16.2.0"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "IE 11"
+  ]
 }
