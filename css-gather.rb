@@ -17,6 +17,7 @@ module CssGather
     all_css = document.css('link[rel="stylesheet"],style')
     all_css.reject { |s| s['media'] == 'print' }
            .reject { |s| s['id'] =~ /criticalCss|cssHide/ }
+           .reject { |s| s['href'] =~ /\/_next\/static\/css/}
   end
 
   def self.gather_stylesheets(css)
