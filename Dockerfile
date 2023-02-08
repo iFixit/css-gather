@@ -1,21 +1,20 @@
 FROM ruby:2.7.3
 
 RUN apt-get update
-Run apt-get install -y \
-  curl \
-  make \
-  openssl \
+RUN apt-get install -y \
   nodejs \
-  npm
+  npm \
+  chromium \
+  libxss1
 
 WORKDIR /app
+COPY . ./
 
 COPY Gemfile Gemfile.lock ./
 
-RUN gem install bundler
+RUN gem install bundler -v 2.4.6
 RUN bundle check || bundle install
 
 COPY package.json package-lock.json ./
-RUN npm install
 
-CMD ./run.rb https://www.ifixit.com
+RUN npm install

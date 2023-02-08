@@ -2,6 +2,7 @@ version: '3.4'
 
 services:
   app:
+    image: css-gather
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +10,7 @@ services:
       - .:/app
       - gem_cache:/usr/local/bundle/gems
       - node_modules:/app/node_modules
+
 volumes:
   gem_cache:
   node_modules:
