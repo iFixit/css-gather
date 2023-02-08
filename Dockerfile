@@ -8,7 +8,6 @@ RUN apt-get install -y \
   libxss1
 
 WORKDIR /app
-COPY . ./
 
 COPY Gemfile Gemfile.lock ./
 
@@ -18,3 +17,5 @@ RUN bundle check || bundle install
 COPY package.json package-lock.json ./
 
 RUN npm install
+
+COPY . ./
