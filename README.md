@@ -10,14 +10,13 @@ Helpful tools for working with critical CSS
 # Usage
 `cd` to a clone of this repo
 
-Fetch dependencies
+Build docker image:
 ```sh
-gem install bundler
-bundle install
-npm install
+docker-compose build
 ```
 
-Pass a URL to `run.sh` to generate critical CSS for it:
+Generate critical css by running the `run.sh` command in a css-gather container and passing it a URL to analyze:
+
 ```sh
-./run.sh https://www.ifixit.com
+docker run css-gather ./run.rb https://www.ifixit.com
 ```
