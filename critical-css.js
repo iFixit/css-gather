@@ -2,6 +2,8 @@
 
 const yargs = require('yargs')
 const penthouse = require('penthouse')
+const fs = require("fs");
+const path = require("path");
 
 const args = yargs(process.argv.slice(2))
   .usage('$0 [url..]', 'Extract the critical CSS from the passed blob of CSS', (yargs) => {
@@ -35,5 +37,21 @@ function findCriticalCss(cssString, url) {
     timeout: 120000,
     width: 4096,
     height: 2160,
-    blockJSRequests: false
+    blockJSRequests: false,
+    screenshots: {
+      basePath: getScreenshotPath(url),
+      type: 'jpeg',
+      quality: 100
+    }
   })}
+
+// Returns a relative path for the screenshot using the url
+function getScreenshotPath(url) {
+  const screenshotsDir = "critical-css-screenshots";
+  // sanitize the url to use it as a filename
+  const filename = url.replace(/[:/]/g, '-');
+  if (!fs.existsSync(screenshotsDir)) {
+    fs.mkdirSync(screenshotsDir);
+  }
+  return path.join(screenshotsDir, filename)
+}
