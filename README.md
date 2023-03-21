@@ -20,3 +20,10 @@ Generate critical css by running the `run.sh` command in a css-gather container 
 ```sh
 docker run css-gather ./run.rb https://www.ifixit.com
 ```
+
+Generate critical css and save [screenshots](https://github.com/pocketjoso/penthouse/blob/master/examples/screenshots.js#L1-L4) in critical-css-screenshots folder:
+
+```sh
+mkdir critical-css-screenshots
+docker run --mount type=bind,source="$(pwd)/critical-css-screenshots",target=/app/critical-css-screenshots css-gather ./run.rb https://www.ifixit.com
+```
