@@ -49,7 +49,7 @@ function findCriticalCss(cssString, url) {
 function getScreenshotPath(url) {
   const screenshotsDir = "critical-css-screenshots";
   // sanitize the url to use it as a filename
-  const filename = url.replace(/[:/]/g, '-');
+  const filename = url.replace(/[?/:<>"|*]/g, "-");
   if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir);
   }
