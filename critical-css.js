@@ -37,7 +37,6 @@ function findCriticalCss(cssString, url) {
     timeout: 120000,
     width: 4096,
     height: 2160,
-    blockJSRequests: false,
     screenshots: {
       basePath: getScreenshotPath(url),
       type: 'jpeg',
