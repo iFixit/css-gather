@@ -34,6 +34,13 @@ function main(urls) {
 }
 
 function findCriticalCss(cssString, url) {
+  // When a regex is passed from a command line it converts to a string,
+  // so we need to convert it back to a regex
+  const excludeArr = args['exclude'].map((arg) =>
+    arg.startsWith("/") && arg.endsWith("/")
+      ? new RegExp(arg.slice(1, -1))
+      : arg
+  );
   return penthouse({
     url,
     cssString,
@@ -43,7 +50,7 @@ function findCriticalCss(cssString, url) {
     width: 4096,
     height: 2160,
     blockJSRequests: false,
-    forceExclude: args['exclude'],
+    forceExclude: excludeArr,
     screenshots: {
       basePath: getScreenshotPath(url),
       type: 'jpeg',
