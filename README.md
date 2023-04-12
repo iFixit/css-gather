@@ -27,3 +27,10 @@ Generate critical css and save [screenshots](https://github.com/pocketjoso/penth
 mkdir critical-css-screenshots
 docker run --mount type=bind,source="$(pwd)/critical-css-screenshots",target=/app/critical-css-screenshots css-gather ./run.rb https://www.ifixit.com
 ```
+
+Generate critical css and exclude certain css selectors from the critical css:
+
+```sh
+docker run css-gather./run.rb https://www.ifixit.com/ --exclude=.skip-to-content --exclude=/#contentFloat/
+```
+This will remove `.skip-to-content` and any css selector that matches the `/#contentFloat/` regex.
