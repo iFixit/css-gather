@@ -11,6 +11,11 @@ const args = yargs(process.argv.slice(2))
       describe: 'The URL to compare to',
       type: 'string',
     })
+    yargs.option('exclude', {
+      describe: 'Exclude css selectors to remove in critical css (the `forceExclude` option in penthouse)',
+      type: 'array',
+      default: [],
+    })
   }).argv
 
 main(args['url'])
@@ -38,6 +43,7 @@ function findCriticalCss(cssString, url) {
     width: 4096,
     height: 2160,
     blockJSRequests: false,
+    forceExclude: args['exclude'],
     screenshots: {
       basePath: getScreenshotPath(url),
       type: 'jpeg',
