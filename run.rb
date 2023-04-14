@@ -13,20 +13,21 @@ $logger.level = 'info'
 def main
   opts = Docopt.docopt <<~DOCS
     Usage:
-      run.rb [--include=<url>...] <url>...
+      run.rb [--include=<url>... --exclude=<selector>...] <url>...
 
     Options:
       --include=<text>  Search the specified URLs for CSS files
+      --exclude=<text> CSS selectors to remove in critical css (the `forceExclude` option in penthouse)
   DOCS
-  find_critical(opts['<url>'], opts['--include'])
+  find_critical(opts['<url>'], opts['--include'], opts['--exclude'])
 rescue Docopt::Exit => e
   puts e.message
 end
 
-def find_critical(urls, additional = [])
+def find_critical(urls, additional = [], exclude = [])
   css = fetch_page_css(urls)
   additional_css = find_css(urls, additional).join("\n")
-  critical_css = reduce_to_critical(css.join("\n"), urls)
+  critical_css = reduce_to_critical(css.join("\n"), urls, exclude)
   combined_css = postcss("#{critical_css}\n#{additional_css}")
   puts prettify(combined_css)
 end
@@ -53,9 +54,10 @@ def find_css(urls, names)
   end
 end
 
-def reduce_to_critical(css, urls)
+def reduce_to_critical(css, urls, exclude)
   $logger.info('Extracting critical CSS')
-  subprocess(["#{__dir__}/critical-css.js", *urls], css)
+  exclude_args = exclude.map { |i| "--exclude=#{i}" }
+  subprocess(["#{__dir__}/critical-css.js", *urls, *exclude_args], css)
 end
 
 def prettify(css)
