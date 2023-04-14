@@ -34,13 +34,8 @@ function main(urls) {
 }
 
 function findCriticalCss(cssString, url) {
-  // When a regex is passed from a command line it converts to a string,
-  // so we need to convert it back to a regex
-  const excludeArr = args['exclude'].map((arg) =>
-    arg.startsWith("/") && arg.endsWith("/")
-      ? new RegExp(arg.slice(1, -1))
-      : arg
-  );
+  const excludeArr = validateArrayRegexes(args['exclude']);
+
   return penthouse({
     url,
     cssString,
@@ -67,4 +62,25 @@ function getScreenshotPath(url) {
     fs.mkdirSync(screenshotsDir);
   }
   return path.join(screenshotsDir, filename)
+}
+
+// When a regex is passed from a command line it converts to a string,
+// so we need to convert it back to a regex
+function validateArrayRegexes(arr) {
+  return arr.map((str) => {
+    if (str.startsWith("/") && str.lastIndexOf("/") > 0) {
+      // Extract the regular expression pattern and flags from the string
+      const lastSlashIndex = str.lastIndexOf("/");
+      const pattern = str.substring(1, lastSlashIndex);
+      const flags = str.substring(lastSlashIndex + 1);
+      // Create a new RegExp object with the pattern and flags
+      try {
+        return new RegExp(pattern, flags);
+      } catch (error) {
+        return str;
+      }
+    } else {
+      return str;
+    }
+  });
 }
