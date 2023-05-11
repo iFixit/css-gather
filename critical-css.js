@@ -46,7 +46,7 @@ function findCriticalCss(cssString, url) {
     height: 2160,
     blockJSRequests: false,
     forceExclude: excludeArr,
-    forceInclude: [/where/i],
+    forceInclude: [/^:(\w+)\(/i],
     screenshots: {
       basePath: getScreenshotPath(url),
       type: 'jpeg',
