@@ -1,0 +1,27 @@
+name: Critical CSS
+
+on: push
+
+jobs:
+   test:
+      name: test
+      runs-on: ubuntu-latest
+      timeout-minutes: 10
+      steps:
+         - uses: actions/checkout@v3
+
+         - name: Build the docker image
+           run: docker-compose build
+
+         - name: Prepare the screenshots directory
+           run: mkdir critical-css-screenshots
+
+         - name: Run the run.rb script on https://www.ifixit.com
+           run: docker run --mount type=bind,source="$(pwd)/critical-css-screenshots",target=/app/critical-css-screenshots css-gather ./run.rb https://www.ifixit.com
+
+         - name: Upload the screenshots
+           uses: actions/upload-artifact@v3
+           with:
+              name: before and after screenshots
+              path: critical-css-screenshots
+              retention-days: 2
