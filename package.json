@@ -19,7 +19,7 @@
   "dependencies": {
     "cssnano": "^5.0.1",
     "cssnano-preset-advanced": "^5.0.0",
-    "penthouse": "iFixit/penthouse#manually-set-preferred-store",
+    "penthouse": "github:iFixit/penthouse#testing-branch-fetch",
     "postcss": "^8.2.10",
     "postcss-cli": "^8.3.1",
     "postcss-sorting": "^6.0.0",
