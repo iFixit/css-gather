@@ -31,6 +31,6 @@ docker run --mount type=bind,source="$(pwd)/critical-css-screenshots",target=/ap
 Generate critical css and exclude certain css selectors from the critical css:
 
 ```sh
-docker run css-gather./run.rb https://www.ifixit.com/ --exclude=.skip-to-content --exclude=/#contentFloat/
+docker run css-gather ./run.rb https://www.ifixit.com/ --exclude=.skip-to-content --exclude=/#contentFloat/
 ```
 This will remove `.skip-to-content` and any css selector that matches the `/#contentFloat/` regex.
