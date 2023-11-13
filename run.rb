@@ -25,9 +25,8 @@ rescue Docopt::Exit => e
 end
 
 def find_critical(urls, additional = [], exclude = [])
-  css = fetch_page_css(urls)
   additional_css = find_css(urls, additional).join("\n")
-  critical_css = reduce_to_critical(css.join("\n"), urls, exclude)
+  critical_css = find_critical_css(urls, exclude)
   combined_css = postcss("#{critical_css}\n#{additional_css}")
   puts prettify(combined_css)
 end
@@ -54,10 +53,10 @@ def find_css(urls, names)
   end
 end
 
-def reduce_to_critical(css, urls, exclude)
+def find_critical_css(urls, exclude)
   $logger.info('Extracting critical CSS')
   exclude_args = exclude.map { |i| "--exclude=#{i}" }
-  subprocess(["#{__dir__}/critical-css.js", *urls, *exclude_args], css)
+  subprocess(["#{__dir__}/crit.js", *urls, *exclude_args])
 end
 
 def prettify(css)
@@ -75,11 +74,15 @@ def postcss(css)
 end
 
 ## Runs `command`, piping `data` to it. Returns the stdout.
-def subprocess(command, data)
+def subprocess(command, data = '')
   IO.popen(command, 'r+') do |io|
-    io.write(data)
-    # Let the process know that's all the data
-    io.close_write
+    # if there is data, write it
+    if data
+      io.write(data)
+      # Let the process know that's all the data
+      io.close_write
+    end
+
     io.read
   end
 end

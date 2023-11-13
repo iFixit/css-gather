@@ -7,8 +7,9 @@ then
     exit 1
 fi
 
-file="$(readlink -e "$1")"
-gather_dir="$(readlink -e "$(dirname "$0")")"
+echo "$1"
+file="$(readlink -f "$1")"
+gather_dir="$(readlink -f "$(dirname "$0")")"
 cd "$gather_dir"
 npx --no-install postcss --config="$gather_dir" -r "$file"
 npx --no-install prettier --write "$file"
