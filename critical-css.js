@@ -20,16 +20,20 @@ const args = yargs(process.argv.slice(2))
 
 main(args['url'])
 
-function main(urls) {
+async function main(urls) {
   let cssString = ""
   process.stdin.on('data', str => cssString += str)
-  process.stdin.on('end', () => {
-    urls.map(url => {
+  process.stdin.on('end', async () => {
+    const cssPromises = urls.map(url => {
       process.stderr.write(`Gathering critical CSS for ${url}\n`);
-      findCriticalCss(cssString, url).then(criticalCss => {
-        process.stdout.write(criticalCss)
-      })
-    })
+      return findCriticalCss(cssString, url);
+    });
+
+    const cssArray = await Promise.all(cssPromises);
+
+    for (const css of cssArray) {
+       process.stdout.write(css);
+    }
   })
 }
 
