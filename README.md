@@ -12,7 +12,7 @@ Helpful tools for working with critical CSS
 
 Build docker image:
 ```sh
-docker-compose build
+docker compose build
 ```
 
 Generate critical css by running the `run.sh` command in a css-gather container and passing it a URL to analyze:
