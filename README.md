@@ -34,3 +34,10 @@ Generate critical css and exclude certain css selectors from the critical css:
 docker run css-gather ./run.rb https://www.ifixit.com/ --exclude=.skip-to-content --exclude=/#contentFloat/
 ```
 This will remove `.skip-to-content` and any css selector that matches the `/#contentFloat/` regex.
+
+Generate critical css and keep certain css selectors in the critical css, even when no element matching them is above the fold:
+
+```sh
+docker run css-gather ./run.rb https://www.ifixit.com/ --force-include=.comments-container --force-include=/^\.step-comments/
+```
+This will keep `.comments-container` and any css selector that matches the `/^\.step-comments/` regex (the `forceInclude` option in penthouse).
