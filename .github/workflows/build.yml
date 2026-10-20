@@ -20,7 +20,7 @@ jobs:
            run: docker run --mount type=bind,source="$(pwd)/critical-css-screenshots",target=/app/critical-css-screenshots css-gather ./run.rb https://www.ifixit.com
 
          - name: Upload the screenshots
-           uses: actions/upload-artifact@v3
+           uses: actions/upload-artifact@v7
            with:
               name: before and after screenshots
               path: critical-css-screenshots
