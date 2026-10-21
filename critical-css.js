@@ -16,6 +16,11 @@ const args = yargs(process.argv.slice(2))
       type: 'array',
       default: [],
     })
+    yargs.option('force-include', {
+      describe: 'Keep css selectors in critical css even when they are not above the fold (the `forceInclude` option in penthouse)',
+      type: 'array',
+      default: [],
+    })
   }).argv
 
 main(args['url'])
@@ -39,6 +44,7 @@ async function main(urls) {
 
 function findCriticalCss(cssString, url) {
   const excludeArr = validateArrayRegexes(args['exclude']);
+  const forceIncludeArr = validateArrayRegexes(args['force-include']);
 
   return penthouse({
     url,
@@ -50,6 +56,7 @@ function findCriticalCss(cssString, url) {
     height: 2160,
     blockJSRequests: false,
     forceExclude: excludeArr,
+    forceInclude: forceIncludeArr,
     screenshots: {
       basePath: getScreenshotPath(url),
       type: 'jpeg',
