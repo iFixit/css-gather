@@ -2,6 +2,7 @@
 
 const yargs = require('yargs')
 const penthouse = require('penthouse')
+const csstree = require('css-tree')
 const fs = require("fs");
 const path = require("path");
 
@@ -42,27 +43,70 @@ async function main(urls) {
   })
 }
 
-function findCriticalCss(cssString, url) {
+// Penthouse drops every media query that doesn't match its viewport, so a
+// desktop-only pass leaves out the phone layout's max-width rules. The phone
+// pass keeps what the desktop pass kept, so the result is one filter over the
+// source CSS and the cascade order stays intact.
+async function findCriticalCss(cssString, url) {
   const excludeArr = validateArrayRegexes(args['exclude']);
   const forceIncludeArr = validateArrayRegexes(args['force-include']);
-
-  return penthouse({
+  const options = {
     url,
     cssString,
     pageLoadSkipTimeout: 60000,
     renderWaitTime: 60000,
     timeout: 120000,
-    width: 4096,
-    height: 2160,
     blockJSRequests: false,
     forceExclude: excludeArr,
+  };
+
+  const desktopCss = await penthouse({
+    ...options,
+    width: 4096,
+    height: 2160,
     forceInclude: forceIncludeArr,
-    screenshots: {
-      basePath: getScreenshotPath(url),
-      type: 'jpeg',
-      quality: 100
-    }
-  })}
+    screenshots: screenshotOptions(url, 'desktop'),
+  });
+
+  return penthouse({
+    ...options,
+    width: 412,
+    height: 915,
+    userAgent: PHONE_USER_AGENT,
+    keepLargerMediaQueries: true,
+    forceInclude: [...forceIncludeArr, ...selectorsIn(desktopCss)],
+    screenshots: screenshotOptions(url, 'phone'),
+  });
+}
+
+const PHONE_USER_AGENT =
+  'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36';
+
+// Generated with the css-tree build penthouse uses, so each string equals
+// the selector penthouse compares against forceInclude.
+function selectorsIn(css) {
+  const selectors = new Set();
+  csstree.walk(csstree.parse(css), {
+    visit: 'Rule',
+    enter(rule) {
+      if (rule.prelude.type !== 'SelectorList') {
+        return;
+      }
+      rule.prelude.children.each((selector) => {
+        selectors.add(csstree.generate(selector).trim());
+      });
+    },
+  });
+  return [...selectors];
+}
+
+function screenshotOptions(url, viewport) {
+  return {
+    basePath: `${getScreenshotPath(url)}-${viewport}`,
+    type: 'jpeg',
+    quality: 100,
+  };
+}
 
 // Returns a relative path for the screenshot using the url
 function getScreenshotPath(url) {
