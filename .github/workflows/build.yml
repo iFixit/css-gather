@@ -13,15 +13,8 @@ jobs:
          - name: Build the docker image
            run: docker compose build
 
-         - name: Prepare the screenshots directory
-           run: mkdir critical-css-screenshots
-
          - name: Run the run.rb script on https://www.ifixit.com
-           run: docker run --mount type=bind,source="$(pwd)/critical-css-screenshots",target=/app/critical-css-screenshots css-gather ./run.rb https://www.ifixit.com
+           run: docker run css-gather ./run.rb https://www.ifixit.com > critical.css
 
-         - name: Upload the screenshots
-           uses: actions/upload-artifact@v7
-           with:
-              name: before and after screenshots
-              path: critical-css-screenshots
-              retention-days: 2
+         - name: Fail when the critical CSS is empty
+           run: test "$(wc -c < critical.css)" -gt 10000

@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
 const yargs = require('yargs')
-const penthouse = require('penthouse')
-const fs = require("fs");
-const path = require("path");
+const csstree = require('css-tree')
 
 const args = yargs(process.argv.slice(2))
   .usage('$0 [url..]', 'Extract the critical CSS from the passed blob of CSS', (yargs) => {
@@ -12,12 +10,12 @@ const args = yargs(process.argv.slice(2))
       type: 'string',
     })
     yargs.option('exclude', {
-      describe: 'Exclude css selectors to remove in critical css (the `forceExclude` option in penthouse)',
+      describe: 'Remove these css selectors from the critical css',
       type: 'array',
       default: [],
     })
     yargs.option('force-include', {
-      describe: 'Keep css selectors in critical css even when they are not above the fold (the `forceInclude` option in penthouse)',
+      describe: 'Keep these css selectors in the critical css even when nothing in the page matches them',
       type: 'array',
       default: [],
     })
@@ -42,37 +40,70 @@ async function main(urls) {
   })
 }
 
-function findCriticalCss(cssString, url) {
-  const excludeArr = validateArrayRegexes(args['exclude']);
-  const forceIncludeArr = validateArrayRegexes(args['force-include']);
+// Critical's static engine keeps every rule whose selector matches the HTML
+// the server sends. It runs no browser, so there is no viewport to pick and no
+// media query is dropped.
+async function findCriticalCss(cssString, url) {
+  const { critical } = await import('critical');
+  const exclude = validateArrayRegexes(args['exclude']);
+  const forceInclude = validateArrayRegexes(args['force-include']);
 
-  return penthouse({
-    url,
-    cssString,
-    pageLoadSkipTimeout: 60000,
-    renderWaitTime: 60000,
-    timeout: 120000,
-    width: 4096,
-    height: 2160,
-    blockJSRequests: false,
-    forceExclude: excludeArr,
-    forceInclude: forceIncludeArr,
-    screenshots: {
-      basePath: getScreenshotPath(url),
-      type: 'jpeg',
-      quality: 100
-    }
-  })}
+  const html = await (await fetch(url)).text();
+  const { css } = await critical({
+    // The CSS to filter comes from stdin. Left in, the page's own <link> and
+    // <style> tags would be read a second time, print stylesheet included.
+    html: html.replace(STYLE_TAGS, ''),
+    css: cssString,
+    engine: 'static',
+    minify: false,
+  });
 
-// Returns a relative path for the screenshot using the url
-function getScreenshotPath(url) {
-  const screenshotsDir = "critical-css-screenshots";
-  // sanitize the url to use it as a filename
-  const filename = url.replace(/[?/:<>"|*]/g, "-");
-  if (!fs.existsSync(screenshotsDir)) {
-    fs.mkdirSync(screenshotsDir);
-  }
-  return path.join(screenshotsDir, filename)
+  const used = filterRules(css, (selector) => !matches(selector, exclude));
+  const forced = forceInclude.length
+    ? filterRules(cssString, (selector) => matches(selector, forceInclude))
+    : '';
+  return `${used}\n${forced}\n`;
+}
+
+const STYLE_TAGS = /<link\b[^>]*rel=["']?stylesheet[^>]*>|<style\b[^>]*>[\s\S]*?<\/style>/gi;
+
+function matches(selector, patterns) {
+  return patterns.some((pattern) =>
+    pattern instanceof RegExp ? pattern.test(selector) : pattern === selector
+  );
+}
+
+// Keeps the rules, inside their at-rules, that have a selector `keep` accepts.
+function filterRules(css, keep) {
+  const ast = csstree.parse(css);
+  csstree.walk(ast, {
+    visit: 'Rule',
+    enter(rule, item, list) {
+      if (this.atrule && /keyframes$/i.test(this.atrule.name)) {
+        return;
+      }
+      if (rule.prelude.type !== 'SelectorList') {
+        return;
+      }
+      const kept = rule.prelude.children
+        .toArray()
+        .filter((selector) => keep(csstree.generate(selector).trim()));
+      if (kept.length) {
+        rule.prelude.children.fromArray(kept);
+      } else {
+        list.remove(item);
+      }
+    },
+  });
+  csstree.walk(ast, {
+    visit: 'Atrule',
+    leave(atrule, item, list) {
+      if (atrule.block && atrule.block.children.isEmpty) {
+        list.remove(item);
+      }
+    },
+  });
+  return csstree.generate(ast);
 }
 
 // When a regex is passed from a command line it converts to a string,
