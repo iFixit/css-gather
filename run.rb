@@ -17,8 +17,8 @@ def main
 
     Options:
       --include=<text>  Search the specified URLs for CSS files
-      --exclude=<text> CSS selectors to remove in critical css (the `forceExclude` option in penthouse)
-      --force-include=<text>  CSS selectors to keep in critical css even when they are not above the fold (the `forceInclude` option in penthouse)
+      --exclude=<text> CSS selectors to remove in critical css
+      --force-include=<text>  CSS selectors to keep in critical css even when they are not above the fold
   DOCS
   find_critical(opts['<url>'], opts['--include'], opts['--exclude'], opts['--force-include'])
 rescue Docopt::Exit => e

@@ -48,7 +48,11 @@ async function findCriticalCss(cssString, url) {
   const exclude = validateArrayRegexes(args['exclude']);
   const forceInclude = validateArrayRegexes(args['force-include']);
 
-  const html = await (await fetch(url)).text();
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`${url} answered ${response.status}`);
+  }
+  const html = await response.text();
   const { css } = await critical({
     // The CSS to filter comes from stdin. Left in, the page's own <link> and
     // <style> tags would be read a second time, print stylesheet included.
@@ -60,7 +64,7 @@ async function findCriticalCss(cssString, url) {
 
   const used = filterRules(css, (selector) => !matches(selector, exclude));
   const forced = forceInclude.length
-    ? filterRules(cssString, (selector) => matches(selector, forceInclude))
+    ? filterRules(cssString, (selector) => matches(selector, forceInclude), RULES_ONLY)
     : '';
   return `${used}\n${forced}\n`;
 }
@@ -73,8 +77,14 @@ function matches(selector, patterns) {
   );
 }
 
+const RULES_ONLY = true;
+const RULE_CONTAINERS = new Set(['media', 'supports', 'layer', 'container']);
+
 // Keeps the rules, inside their at-rules, that have a selector `keep` accepts.
-function filterRules(css, keep) {
+// With rulesOnly, at-rules that hold no rules (@font-face, @keyframes,
+// @import) are dropped too: the forced pass reads the whole source CSS and
+// would otherwise copy every one of them.
+function filterRules(css, keep, rulesOnly = false) {
   const ast = csstree.parse(css);
   csstree.walk(ast, {
     visit: 'Rule',
@@ -98,7 +108,9 @@ function filterRules(css, keep) {
   csstree.walk(ast, {
     visit: 'Atrule',
     leave(atrule, item, list) {
-      if (atrule.block && atrule.block.children.isEmpty) {
+      const empty = atrule.block && atrule.block.children.isEmpty;
+      const holdsRules = atrule.block && RULE_CONTAINERS.has(atrule.name.toLowerCase());
+      if (empty || (rulesOnly && !holdsRules)) {
         list.remove(item);
       }
     },
